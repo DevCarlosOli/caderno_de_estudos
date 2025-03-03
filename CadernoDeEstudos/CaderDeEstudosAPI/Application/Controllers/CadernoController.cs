@@ -28,6 +28,17 @@ namespace CaderDeEstudosAPI.Application.Controllers {
             }            
         }
 
+        [HttpGet("{cadernoId}")]
+        public async Task<ActionResult<Caderno>> GetCadernoById(int cadernoId) {
+            try {
+                var caderno = await _cadernoService.FindCadernoByIdAsync(cadernoId);
+                return Ok(caderno);
+            }
+            catch (Exception ex) {
+                throw new Exception(ex.Message);
+            }
+        }
+
         [HttpPost]
         public async Task<ActionResult<Caderno>> PostCadernoAsync([FromBody]CadernoDTO cadernoDto) {
             try {
@@ -37,6 +48,33 @@ namespace CaderDeEstudosAPI.Application.Controllers {
                 var caderno = _mapper.Map<Caderno>(cadernoDto);
 
                 var result = await _cadernoService.AddCadernoAsync(caderno);
+                return Ok(result);
+            }
+            catch (Exception ex) {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        [HttpPut]
+        public async Task<ActionResult<Caderno>> PutCadernoAsync([FromQuery] int cadernoId, [FromBody]CadernoDTO cadernoDTO) {
+            try {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
+
+                var caderno = _mapper.Map<Caderno>(cadernoDTO);
+
+                var result = await _cadernoService.UpdateCadernoAsync(cadernoId, caderno);
+                return Ok(result);
+            }
+            catch (Exception ex) {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        [HttpDelete]
+        public async Task<ActionResult<int>> DeleteCadernoAsync([FromQuery]int cadernoID) {
+            try {
+                var result = await _cadernoService.DeleteCadernoAsync(cadernoID);
                 return Ok(result);
             }
             catch (Exception ex) {

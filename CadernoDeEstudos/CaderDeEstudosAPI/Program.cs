@@ -13,7 +13,9 @@ builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 // Add services to the container.
 builder.Services.AddScoped<ICadernoRepository, CadernoRepository>();
+builder.Services.AddScoped<INotasRepository, NotasRepository>();
 builder.Services.AddScoped<ICadernoService, CadernoService>();
+builder.Services.AddScoped<INotasService, NotasService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
