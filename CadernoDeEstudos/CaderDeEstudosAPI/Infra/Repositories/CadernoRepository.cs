@@ -12,35 +12,55 @@ namespace CaderDeEstudosAPI.Infra.Repositories {
         }
 
         public async Task<List<Caderno>> FindAllCadernosAsync() {
-            var cadernos = new List<Caderno>();
+            var cadernos = new Dictionary<int, Caderno>();
 
             using (var conn = _dbPostegreSql.GetConnection()) {
                 await conn.OpenAsync();
 
                 using (var cmd = conn.CreateCommand()) {
                     cmd.CommandText = @"
-                                        SELECT
-                                                CADERNO_ID,
-                                                NOME,
-                                                DESCRICAO,
-                                                DATA_CRIACAO
-                                         FROM   CADERNO
+                                        SELECT 
+		                                        C.CADERNO_ID,
+		                                        C.NOME,
+		                                        C.DESCRICAO,
+		                                        C.DATA_CRIACAO AS CRIACAO_CADERNO,
+		                                        N.NOTAS_ID,
+		                                        N.TITULO,
+		                                        N.CONTEUDO,
+		                                        N.DATA_CRIACAO AS CRIACAO_NOTA
+	                                      FROM  CADERNO C
+	                                 LEFT JOIN  NOTAS N ON N.CADERNO_ID = C.CADERNO_ID
                     ";
 
                     using (var dr = await cmd.ExecuteReaderAsync()) {
-                        while (await dr.ReadAsync()) { 
-                            var caderno = new Caderno();
-                            caderno.CadernoId = dr.GetInt32("CADERNO_ID");
-                            caderno.Nome = dr.GetString("NOME");
-                            caderno.Descricao = dr.IsDBNull("DESCRICAO") ? null : dr.GetString("DESCRICAO");
-                            caderno.DataCriacao = dr.GetDateTime("DATA_CRIACAO");
+                        while (await dr.ReadAsync()) {
+                            int cadernoId = dr.GetInt32("CADERNO_ID");
 
-                            cadernos.Add(caderno);
+                            if (!cadernos.TryGetValue(cadernoId, out var caderno)) {
+                                caderno = new Caderno();
+                                caderno.CadernoId = cadernoId;
+                                caderno.Nome = dr.GetString("NOME");
+                                caderno.Descricao = dr.IsDBNull("DESCRICAO") ? null : dr.GetString("DESCRICAO");
+                                caderno.DataCriacao = dr.GetDateTime("CRIACAO_CADERNO");
+                                caderno.Notas = new List<Notas>();
+
+                                cadernos.Add(cadernoId, caderno);
+                            }
+
+                            if (!dr.IsDBNull("NOTAS_ID")) {
+                                var nota = new Notas();
+                                nota.NotasId = dr.GetInt32("NOTAS_ID");
+                                nota.Titulo = dr.GetString("TITULO");
+                                nota.Conteudo = dr.IsDBNull("CONTEUDO") ? null : dr.GetString("CONTEUDO");
+                                nota.DataCriacao = dr.GetDateTime("CRIACAO_NOTA");
+
+                                caderno.Notas.Add(nota);
+                            }
                         }
                     }
                 }
             }
-            return cadernos;
+            return cadernos.Values.ToList();
         }
 
         public async Task<Caderno> FindCadernoByIdAsync(int cadernoId) {
@@ -106,7 +126,7 @@ namespace CaderDeEstudosAPI.Infra.Repositories {
         }
 
         public async Task<Caderno> UpdateCadernoAsync(int cadernoId, Caderno caderno) {
-            using (var conn = _dbPostegreSql.GetConnection()) { 
+            using (var conn = _dbPostegreSql.GetConnection()) {
                 await conn.OpenAsync();
 
                 using (var cmd = conn.CreateCommand()) {

@@ -56,7 +56,7 @@ namespace CaderDeEstudosAPI.Application.Controllers {
         }
 
         [HttpPut]
-        public async Task<ActionResult<Caderno>> PutCadernoAsync([FromQuery] int cadernoId, [FromBody]CadernoDTO cadernoDTO) {
+        public async Task<ActionResult<Caderno>> PutCadernoAsync([FromQuery(Name = "cadernoId")] int cadernoId, [FromBody]CadernoDTO cadernoDTO) {
             try {
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
@@ -72,9 +72,9 @@ namespace CaderDeEstudosAPI.Application.Controllers {
         }
 
         [HttpDelete]
-        public async Task<ActionResult<int>> DeleteCadernoAsync([FromQuery]int cadernoID) {
+        public async Task<ActionResult<int>> DeleteCadernoAsync([FromQuery(Name = "cadernoId")]int cadernoId) {
             try {
-                var result = await _cadernoService.DeleteCadernoAsync(cadernoID);
+                var result = await _cadernoService.DeleteCadernoAsync(cadernoId);
                 return Ok(result);
             }
             catch (Exception ex) {
