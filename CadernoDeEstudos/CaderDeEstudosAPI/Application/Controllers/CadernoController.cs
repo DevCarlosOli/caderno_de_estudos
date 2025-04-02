@@ -2,7 +2,6 @@
 using CaderDeEstudosAPI.Application.Services.Interfaces;
 using CaderDeEstudosAPI.Domain.Models;
 using CaderDeEstudosAPI.Domain.Models.DTOs;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CaderDeEstudosAPI.Application.Controllers {

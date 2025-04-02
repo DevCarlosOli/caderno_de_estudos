@@ -1,7 +1,5 @@
 ﻿using CaderDeEstudosAPI.Application.Services.Interfaces;
 using CaderDeEstudosAPI.Domain.Models;
-using CaderDeEstudosAPI.Domain.Models.DTOs;
-using CaderDeEstudosAPI.Infra.Repositories;
 using CaderDeEstudosAPI.Infra.Repositories.Interfaces;
 
 namespace CaderDeEstudosAPI.Application.Services {
